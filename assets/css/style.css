@@ -1,11 +1,17 @@
 :root {
-  --primary: #ccdad1;
+  --primary: #f3f3f3;
   --secondary: #9caea9;
   --tertiary: #788585;
   --light-dark: #6f6866;
+  --white: #ffffff;
   --dark: #38302e;
+  --special-purple: linear-gradient(0.25turn, #512da8, #311B92);
   --border-radius: 0.3rem;
 }
+/* found nice colors at the bottom of this linked page
+https://mdbootstrap.com/docs/standard/content-styles/colors/ */
+
+/* used to create special-gradient */
 
 * {
   box-sizing: border-box;
@@ -42,21 +48,6 @@ p {
   font-size: 1.2rem;
 }
 
-.btn {
-  font-size: 1.3rem;
-  text-decoration: none;
-  padding: 6px 5px;
-  width: 100%;
-  display: block;
-  margin: 5px 0;
-  border-radius: var(--border-radius);
-  color: var(--primary);
-  border: none;
-  outline: none;
-  background-color: var(--light-dark);
-  box-shadow: 3px 3px var(--dark);
-  transform: translate(-1px, -1px);
-}
 
 .btn:hover {
   color: var(--primary);
@@ -93,9 +84,7 @@ p {
 }
 
 .hero {
-  padding: 3% 4%;
-  background-color: var(--dark);
-  color: var(--primary);
+  background-image: var(--special-purple);
 }
 
 .hero p {
@@ -104,12 +93,7 @@ p {
 
 .app-title {
   font-size: 3rem;
-  background-color: var(--primary);
-  color: var(--dark);
-  padding: 0 10px;
   display: inline-block;
-  border-radius: var(--border-radius);
-  box-shadow: 6px 5px var(--light-dark);
 }
 
 .list-group {

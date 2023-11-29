@@ -251,7 +251,7 @@ function apiCall(cityName) {
         // we have the geolocation of the city now we need make a current weather call and a 5 dat forcast call
 
         // NOw that we have the lat and long we can use string concat to insert those values and make an API call 
-        let weatherCall5Day = 'https:api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + long + '&appid=' + key
+        const weatherCall5Day = 'https:api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + long + '&appid=' + key
           + '&cnt=40&units=imperial';
 
         fetch(weatherCall5Day)
@@ -263,7 +263,7 @@ function apiCall(cityName) {
             console.log('API request was a success \n----------');
             console.log(weatherCall5DayData);
 
-            let currentWeather = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid='
+            const currentWeather = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid='
               + key + '&units=imperial';
 
             fetch(currentWeather)

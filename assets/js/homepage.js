@@ -1,18 +1,3 @@
-// GIVEN a weather dashboard with form inputs
-// WHEN I search for a city
-// THEN I am presented with current and future conditions for that city and that city is added to the search history
-// WHEN I view current weather conditions for that city
-// THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, and the the wind speed
-// WHEN I view future weather conditions for that city
-// THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
-// WHEN I click on a city in the search history
-// THEN I am again presented with current and future conditions for that city
-
-// api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
-
-// http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid={API key}
-
-// this is a bogus Zipcode at the moment 
 
 let city = $('#city');
 let saveBtn = $('#svBtn');
@@ -26,24 +11,10 @@ const key = 'fb1f3dcb852ef70f92f8472645b9bbfd';
 let timer;
 let timerCtr = 20;
 
-
 // A simple function which validates the Zip Code has a correct length of 5
 function init() {
   printCities();
 }
-
-saveBtn.on('click', function () {
-  let cityName = city.val();
-  apiCall(cityName);
-});
-
-resetBtn.on('click', newSearch)
-
-svCityBtn.on('click', function () {
-  saveToStorage();
-  citySaved();
-});
-
 
 function hide(elementId) {
   elementId.addClass('invisible');
@@ -54,12 +25,15 @@ function show(elementId) {
 }
 
 function disableButton(buttonId) {
+
+  // given a string that has the name of the id of the button which we want to disable when called
   let button = document.getElementById(buttonId);
   button.disabled = 'disabled';
 }
 
 function newSearch() {
 
+  // appends a new element to target to display to the user that a new search is init
   $('#target').append('<div class="card">' +
     '<div class="card-body">' +
     '<h3 class="mb-3">Beginning a new search</h3>' +
@@ -80,29 +54,35 @@ function newSearch() {
     }
     // set in Nanoseconds
   }, 100);
-  // Resets timer back to 10 for the next time an invlaid zip code is entered
   timerCtr = 20;
 }
 
 function resetPage() {
+  // location == current page == index.html
   location.reload();
 }
 
 function saveToStorage() {
+
+  // loads the current cities saved in local storage
   let cityList = fromStorage();
+
+  // $('#city') has the name of the city to be saved
   let cityName = city.val();
 
+  // create a newCity object which has one attribute: the name of the saved city
   let newCity = {
     city_name: cityName
   };
 
+  // overwrites the "cold start" case where nothing has been saved to local yet
   if (cityList[0] === null) {
     cityList[0] = newCity;
   }
-
   else {
     cityList.push(newCity);
   }
+  // we want update local storage with the new object added
   saveCityToStorage(cityList);
 }
 
@@ -153,11 +133,37 @@ function citySaved() {
   timerCtr = 20;
 }
 
+function notRealCity() {
+
+  $('#target').append('<div class="card">' +
+    '<div class="card-body">' +
+    '<h3 class="mb-3">Not a Real City... </h3>' +
+    '</div>' +
+    '</div>');
+  timer = setInterval(function () {
+    timerCtr--;
+    //  Show element indicating that user's Zip Code is invalid  
+    if (timerCtr <= 0) {
+
+      //  if quickTimer is less than or equal to 0 then hide the element 
+      clearInterval(timer);
+      $('#target').empty();
+    }
+    // set in Nanoseconds
+  }, 60);
+  // Resets timer back to 10 for the next time an invlaid zip code is entered
+  timerCtr = 20;
+}
+
 function printCities() {
   let cityList = fromStorage();
 
+  // if nothing is in local then don't append anything  
   if (cityList[0] != null) {
+
+    // otherwise print all saved cities from local
     for (let i = 0; i < cityList.length; i++) {
+      // these button ids will be used to determine code operation see: line 214
       svCityList.append('<li id="nav-delete-btn" class="list-group-item">' + cityList[i].city_name + '</li>' +
         '<div id="div-delete-btn" class = "d-flex">' +
         '<button type="button" id="deleteBtn' + i + '" class="mb-4 mt-2 btn btn-danger">Delete</button>' +
@@ -166,11 +172,13 @@ function printCities() {
       );
     }
 
-
+    // this will test any button pressed, probably not the best method 
     let navBtnControl = $('button')
 
+    // when any button is pressed
     navBtnControl.on("click", function () {
 
+      // the code grabs the id of the button pressed
       // we can now find the individual buttons within the nav
       let buttonId = $(this).attr('id')
 
@@ -180,26 +188,35 @@ function printCities() {
       let number = buttonId.slice(buttonId.indexOf(searchTerm) + 1, buttonId.length);
       let loadedCity = navList.children('li');
 
+      // if the button pressed is a deleteBtn then determine what city is being deleted by exploring the li
+      // using the id="deleteBtn' + i +... i = number, therefore we can now determine the city based 
+      // off of the button pressed
       if (found == "deleteBtn") {
         deleteFromStorage(loadedCity[number].innerHTML);
         loadedCity[number].innerHTML = "This city has been deleted...";
         let disableLoadThis = $(this).next().attr('id');
         disableButton(disableLoadThis);
-        console.log(disableLoadThis);
       }
-
+      // if the button pressed is a loadBtn then determine what city is being deleted by exploring the li
+      // using the id="loadBtn' + i +... i = number, therefore we can now determine the city based 
+      // off of the button pressed
       if (found == "loadBtn") {
-        console.log("thing")
         let cityName = loadedCity[number].innerHTML
+
+        // .empty() removes not only child (and other descendant)
+        //  elements, but also any text within the set of matched elements.
+        // https://api.jquery.com/empty/ for more
         $('.current-day').empty();
         $('.5-day').empty();
         $('#5day-target').empty();
+
+        // pass the city called the api call, this will load dat
         apiCall(cityName);
       }
+      // else
+      // do nothing 
     });
-
   }
-
 
   function deleteFromStorage(city) {
     let cityList = fromStorage();
@@ -233,113 +250,141 @@ function apiCall(cityName) {
         return cityNameresponse.json();
       })
       .then(function (cityNameData) {
-        console.log('API request was a success \n----------');
-        console.log(cityNameData);
+        // in the case the city doesn't exist then the call return an empty array whose length be 0
+        if (cityNameData.length == 0) {
+          notRealCity()
+        }
+        else {
 
-        // grabbing the lat and long 
-        let temp1 = cityNameData[0].lat;
-        let temp2 = cityNameData[0].lon;
 
-        // coverting lat and long into strings
-        temp1 = temp1.toString();
-        temp2 = temp2.toString();
+          console.log('API request was a success \n----------');
+          console.log(cityNameData);
 
-        // offically declaring var lat and long, these strings have the last two digits removed  
-        let lat = temp1.slice(0, temp1.length - 2);
-        let long = temp2.slice(0, temp2.length - 2);
+          // grabbing the lat and long 
+          let temp1 = cityNameData[0].lat;
+          let temp2 = cityNameData[0].lon;
 
-        // we have the geolocation of the city now we need make a current weather call and a 5 dat forcast call
+          // coverting lat and long into strings
+          temp1 = temp1.toString();
+          temp2 = temp2.toString();
 
-        // NOw that we have the lat and long we can use string concat to insert those values and make an API call 
-        const weatherCall5Day = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + long + '&appid=' + key
-          + '&cnt=40&units=imperial';
+          // offically declaring var lat and long, these strings have the last two digits removed  
+          let lat = temp1.slice(0, temp1.length - 2);
+          let long = temp2.slice(0, temp2.length - 2);
 
-        fetch(weatherCall5Day)
-          .then(function (weatherCall5DayResponse) {
-            return weatherCall5DayResponse.json();
-          })
+          // we have the geolocation of the city now we need make a current weather call and a 5 dat forcast call
 
-          .then(function (weatherCall5DayData) {
-            console.log('API request was a success \n----------');
-            console.log(weatherCall5DayData);
+          // NOw that we have the lat and long we can use string concat to insert those values and make an API call 
+          const weatherCall5Day = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + long + '&appid=' + key
+            + '&cnt=40&units=imperial';
 
-            const currentWeather = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid='
-              + key + '&units=imperial';
+          fetch(weatherCall5Day)
+            .then(function (weatherCall5DayResponse) {
+              return weatherCall5DayResponse.json();
+            })
 
-            fetch(currentWeather)
-              .then(function (currentWeatherResponse) {
-                return currentWeatherResponse.json();
-              })
+            .then(function (weatherCall5DayData) {
+              console.log('API request was a success \n----------');
+              console.log(weatherCall5DayData);
 
-              .then(function (currentWeatherData) {
-                console.log('API request was a success \n----------');
-                console.log(currentWeatherData);
+              const currentWeather = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid='
+                + key + '&units=imperial';
 
-                // https://openweathermap.org/forecast5#data for how to nav the fields
+              fetch(currentWeather)
+                .then(function (currentWeatherResponse) {
+                  return currentWeatherResponse.json();
+                })
 
-                $('.current-day').append('<div class="name p-2 font-weight-bold">' + cityNameData[0].name + '  '
-                  + '[' + today.format('MMM D, YYYY') + ']' + ' </div>');
+                .then(function (currentWeatherData) {
+                  console.log('API request was a success \n----------');
+                  console.log(currentWeatherData);
 
-                let temperature = currentWeatherData.main.temp
-                $('.current-day').append('<div class="temp p-2">Temperature: ' + temperature + ' °F</div>');
+                  // https://openweathermap.org/forecast5#data for how to nav the fields
 
-                let wind = currentWeatherData.wind.speed
-                $('.current-day').append('<div class="wind p-2">Wind: ' + wind + ' MPH</div>');
+                  $('.current-day').append('<div class="name p-2 font-weight-bold">' + cityNameData[0].name + '  '
+                    + '[' + today.format('MMM D, YYYY') + ']' + ' </div>');
 
-                let humidity = currentWeatherData.main.humidity
-                $('.current-day').append('<div class="hum p-2">Humidity: ' + humidity + ' %</div>');
+                  let temperature = currentWeatherData.main.temp
+                  $('.current-day').append('<div class="temp p-2">Temperature: ' + temperature + ' °F</div>');
 
-                // https://stackoverflow.com/questions/44177417/how-to-display-openweathermap-weather-icon
-                // the article approve provides instruction on how this operation is taking place
-                $('.current-day').append('<div id="icon" class="p-2"><img id="wicon" src="" alt="Weather icon"></div>');
+                  let wind = currentWeatherData.wind.speed
+                  $('.current-day').append('<div class="wind p-2">Wind: ' + wind + ' MPH</div>');
 
-                // let icon = weatherCall5DayData.list[0].weather[0].icon;
-                let icon = currentWeatherData.weather[0].icon;
+                  let humidity = currentWeatherData.main.humidity
+                  $('.current-day').append('<div class="hum p-2">Humidity: ' + humidity + ' %</div>');
 
-                let iconurl = "http://openweathermap.org/img/w/" + icon + ".png";
+                  // https://stackoverflow.com/questions/44177417/how-to-display-openweathermap-weather-icon
+                  // the article approve provides instruction on how this operation is taking place
+                  $('.current-day').append('<div id="icon" class="p-2"><img id="wicon" src="" alt="Weather icon"></div>');
 
-                $('#wicon').attr('src', iconurl);
+                  let icon = currentWeatherData.weather[0].icon;
+                  let iconurl = "http://openweathermap.org/img/w/" + icon + ".png";
 
-                $('.weather-icon').append(icon);
+                  $('#wicon').attr('src', iconurl);
+                  $('.weather-icon').append(icon);
+                  $('.5-day').append('<h3> 5-Day Forecast <h3>');
 
-                $('.5-day').append('<h3> 5-Day Forecast <h3>');
+                  // now that we have all the data loaded from the APIs called, we can continue with 
+                  // updating the page's 5-day forcast
+                  // really supid code but we really don't need anything more complex 
+                  for (let i = 0; i < weatherCall5DayData.list.length; i = i + 8) {
 
-                // now that we have all the data loaded from the APIs called, we can continue with 
-                // updating the page's 5-day forcast
-                // really supid code but we really don't need anything more complex 
-                for (let i = 0; i < weatherCall5DayData.list.length; i = i + 8) {
+                    // while loop is iterating, the code will store data
+                    let temperature5Day = weatherCall5DayData.list[i].main.temp;
+                    let humidity5Day = weatherCall5DayData.list[i].main.humidity;
+                    let wind5Day = weatherCall5DayData.list[i].wind.speed;
+                    let futureDay = weatherCall5DayData.list[i].dt_txt;
+                    let icon5day = weatherCall5DayData.list[i].weather[0].icon;
 
-                  let temperature5Day = weatherCall5DayData.list[i].main.temp;
-                  let humidity5Day = weatherCall5DayData.list[i].main.humidity;
-                  let wind5Day = weatherCall5DayData.list[i].wind.speed;
-                  let futureDay = weatherCall5DayData.list[i].dt_txt;
-                  let icon5day = weatherCall5DayData.list[i].weather[0].icon;
+                    // removing the time stamp from the data grabbed
+                    futureDay = futureDay.slice(0, futureDay.length - 9);
 
-                  futureDay = futureDay.slice(0, futureDay.length - 9);
+                    // in index.html the div whose id= 5day-target will have new elements with data
+                    // grabbed from api calls, these elemnts will be visible to the user and represent
+                    // weather data for the 5-day forcast
+                    $('#5day-target').append('<div class="card">' +
+                      '<div id="icon" class="p-2"><img id="wicon' + i + '" src="" alt="Weather icon"></div>' +
+                      '<div class="card-body">' +
+                      '<h5 class="card-title p-2">' + futureDay + '</h5>' + '<div class="wind p-2">Wind: ' + wind5Day + ' MPH</div>' +
+                      '<div class="temp p-2">Temperature: ' + temperature5Day + ' °F</div>' +
+                      '<div class="hum p-2">Humidity: ' + humidity5Day + ' %</div>' +
+                      '</div>');
 
-                  $('#5day-target').append('<div class="card">' +
-                    '<div id="icon" class="p-2"><img id="wicon' + i + '" src="" alt="Weather icon"></div>' +
-                    '<div class="card-body">' +
-                    '<h5 class="card-title p-2">' + futureDay + '</h5>' + '<div class="wind p-2">Wind: ' + wind5Day + ' MPH</div>' +
-                    '<div class="temp p-2">Temperature: ' + temperature5Day + ' °F</div>' +
-                    '<div class="hum p-2">Humidity: ' + humidity5Day + ' %</div>' +
-                    '</div>');
-
-                  let iconUrl5day = "http://openweathermap.org/img/w/" + icon5day + ".png";
-                  $('#wicon' + i).attr('src', iconUrl5day);
-                  $('.weather-icon').append(icon5day);
-                }
-                show($('#target-1'));
-                show($('#target-2'));
-                show($('#target-3'));
-                show($('#saveThisCity'));
-                disableButton('svBtn');
-              });
-          });
+                    // https://stackoverflow.com/questions/44177417/how-to-display-openweathermap-weather-icon
+                    // the article approve provides instruction on how this operation is taking place
+                    let iconUrl5day = "http://openweathermap.org/img/w/" + icon5day + ".png";
+                    $('#wicon' + i).attr('src', iconUrl5day);
+                    $('.weather-icon').append(icon5day);
+                  }
+                  show($('#target-1'));
+                  show($('#target-2'));
+                  show($('#target-3'));
+                  show($('#saveThisCity'));
+                  disableButton('svBtn');
+                });
+            });
+        }
       });
   }
   else
-    window.alert("Thats not a real city")
+    notRealCity();
 }
 
-init();
+// when the docuement is ready, run init and wait for button clicks
+$(function () {
+
+  init();
+
+  saveBtn.on('click', function () {
+    let cityName = city.val();
+    apiCall(cityName);
+  });
+
+  resetBtn.on('click', newSearch)
+
+  svCityBtn.on('click', function () {
+    saveToStorage();
+    citySaved();
+  });
+
+});

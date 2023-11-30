@@ -11,7 +11,6 @@ const key = 'fb1f3dcb852ef70f92f8472645b9bbfd';
 let timer;
 let timerCtr = 20;
 
-// A simple function which validates the Zip Code has a correct length of 5
 function init() {
   printCities();
 }
@@ -209,6 +208,7 @@ function printCities() {
         $('.current-day').empty();
         $('.5-day').empty();
         $('#5day-target').empty();
+        disableButton("svCityBtn");
 
         // pass the city called the api call, this will load dat
         apiCall(cityName);

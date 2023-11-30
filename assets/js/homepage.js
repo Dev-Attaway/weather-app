@@ -46,7 +46,7 @@ function newSearch() {
     hide($('#saveThisCity'));
     if (timerCtr <= 0) {
 
-      //  if quickTimer is less than or equal to 0 then hide the element 
+      //If quickTimer is less than or equal to 0 then hide the element 
       clearInterval(timer);
       resetPage();
 
@@ -81,22 +81,22 @@ function saveToStorage() {
   else {
     cityList.push(newCity);
   }
-  // we want update local storage with the new object added
+  //We want to update local storage with the new object added
   saveCityToStorage(cityList);
 }
 
 function fromStorage() {
   let cityName = localStorage.getItem('cityList');
 
-  // if somebtnNumber was succefully loaded in description then 
-  // JSON.parse(discription) transfroms the strings loaded from
+  //If somebtnNumber was successfully loaded in the description then 
+  // JSON.parse(description) transforms the strings loaded from
   //  local storage into objects
   if (cityName) {
     cityName = JSON.parse(cityName);
   }
 
   // returns an empty array if description = falsey
-  // meaning that there was nobtnNumber in local storage to load 
+  // meaning that there was nothing in local storage to load 
   else {
     cityName = [null];
   }
@@ -122,13 +122,13 @@ function citySaved() {
     hide($('#saveThisCity'));
     if (timerCtr <= 0) {
 
-      //  if quickTimer is less than or equal to 0 then hide the element 
+      //If quickTimer is less than or equal to 0 then hide the element 
       clearInterval(timer);
       resetPage();
     }
     // set in Nanoseconds
   }, 100);
-  // Resets timer back to 10 for the next time an invlaid zip code is entered
+  // Resets timer back to 10 for the next time an invalid zip code is entered
   timerCtr = 20;
 }
 
@@ -144,25 +144,25 @@ function notRealCity() {
     //  Show element indicating that user's Zip Code is invalid  
     if (timerCtr <= 0) {
 
-      //  if quickTimer is less than or equal to 0 then hide the element 
+      //If quickTimer is less than or equal to 0 then hide the element 
       clearInterval(timer);
       $('#target').empty();
     }
     // set in Nanoseconds
   }, 60);
-  // Resets timer back to 10 for the next time an invlaid zip code is entered
+  // Resets timer back to 10 for the next time an invalid zip code is entered
   timerCtr = 20;
 }
 
 function printCities() {
   let cityList = fromStorage();
 
-  // if nothing is in local then don't append anything  
+  //If nothing is local then don't append anything  
   if (cityList[0] != null) {
 
     // otherwise print all saved cities from local
     for (let i = 0; i < cityList.length; i++) {
-      // these button ids will be used to determine code operation see: line 214
+      //These button ids will be used to determine code operation see: line 214
       svCityList.append('<li id="nav-delete-btn" class="list-group-item">' + cityList[i].city_name + '</li>' +
         '<div id="div-delete-btn" class = "d-flex">' +
         '<button type="button" id="deleteBtn' + i + '" class="mb-4 mt-2 btn btn-danger">Delete</button>' +
@@ -171,14 +171,14 @@ function printCities() {
       );
     }
 
-    // this will test any button pressed, probably not the best method 
+    //This will test any button pressed, probably not the best method 
     let navBtnControl = $('button')
 
     // when any button is pressed
     navBtnControl.on("click", function () {
 
-      // the code grabs the id of the button pressed
-      // we can now find the individual buttons within the nav
+      //The code grabs the ID of the button pressed
+      //We can now find the individual buttons within the nav
       let buttonId = $(this).attr('id')
 
       // we need to discover whether the button pressed is a delete btn or a load btn 
@@ -188,7 +188,7 @@ function printCities() {
       let loadedCity = navList.children('li');
 
       // if the button pressed is a deleteBtn then determine what city is being deleted by exploring the li
-      // using the id="deleteBtn' + i +... i = number, therefore we can now determine the city based 
+      // using the id="deleteBtn' + i +... i = number, we can now determine the city-based 
       // off of the button pressed
       if (found == "deleteBtn") {
         deleteFromStorage(loadedCity[number].innerHTML);
@@ -196,8 +196,8 @@ function printCities() {
         let disableLoadThis = $(this).next().attr('id');
         disableButton(disableLoadThis);
       }
-      // if the button pressed is a loadBtn then determine what city is being deleted by exploring the li
-      // using the id="loadBtn' + i +... i = number, therefore we can now determine the city based 
+      //If the button pressed is a loadBtn then determine what city is being deleted by exploring the li
+      // using the id="loadBtn' + i +... i = number, we can now determine the city-based 
       // off of the button pressed
       if (found == "loadBtn") {
         let cityName = loadedCity[number].innerHTML
@@ -210,7 +210,7 @@ function printCities() {
         $('#5day-target').empty();
         disableButton("svCityBtn");
 
-        // pass the city called the api call, this will load dat
+        // pass the city called the API call, this will load data
         apiCall(cityName);
       }
       // else
@@ -226,10 +226,10 @@ function printCities() {
         // remove the object at the current iteration of i, the loop as found the city to remove
         cityList.splice(i, 1)
 
-        // remove everthing from the local storage
+        // remove everything from the local storage
         localStorage.clear();
 
-        // Upload the new array of bojects without the city that was removed
+        // Upload the new array of objects without the city that was removed
         saveCityToStorage(cityList);
       }
     }
@@ -238,7 +238,7 @@ function printCities() {
 
 function apiCall(cityName) {
 
-  // if cityName is truthy then do work 
+  //If cityName is truthy then do the work 
   if (cityName) {
 
     // force the name into our city through concatting the string\
@@ -250,7 +250,7 @@ function apiCall(cityName) {
         return cityNameresponse.json();
       })
       .then(function (cityNameData) {
-        // in the case the city doesn't exist then the call return an empty array whose length be 0
+        // in the case the city doesn't exist then the call returns an empty array whose length is 0
         if (cityNameData.length == 0) {
           notRealCity()
         }
@@ -264,17 +264,17 @@ function apiCall(cityName) {
           let temp1 = cityNameData[0].lat;
           let temp2 = cityNameData[0].lon;
 
-          // coverting lat and long into strings
+          //converting lat and long into strings
           temp1 = temp1.toString();
           temp2 = temp2.toString();
 
-          // offically declaring var lat and long, these strings have the last two digits removed  
+          //officially declaring var lat and long, these strings have the last two digits removed  
           let lat = temp1.slice(0, temp1.length - 2);
           let long = temp2.slice(0, temp2.length - 2);
 
-          // we have the geolocation of the city now we need make a current weather call and a 5 dat forcast call
+          //We have the geolocation of the city now we need to make a current weather call and a 5 day forecast call
 
-          // NOw that we have the lat and long we can use string concat to insert those values and make an API call 
+          // Now that we have the lat and long we can use string concat to insert those values and make an API call 
           const weatherCall5Day = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + long + '&appid=' + key
             + '&cnt=40&units=imperial';
 
@@ -314,7 +314,7 @@ function apiCall(cityName) {
                   $('.current-day').append('<div class="hum p-2">Humidity: ' + humidity + ' %</div>');
 
                   // https://stackoverflow.com/questions/44177417/how-to-display-openweathermap-weather-icon
-                  // the article approve provides instruction on how this operation is taking place
+                  //The article  provides instructions on how this operation is taking place
                   $('.current-day').append('<div id="icon" class="p-2"><img id="wicon" src="" alt="Weather icon"></div>');
 
                   let icon = currentWeatherData.weather[0].icon;
@@ -325,23 +325,23 @@ function apiCall(cityName) {
                   $('.5-day').append('<h3> 5-Day Forecast <h3>');
 
                   // now that we have all the data loaded from the APIs called, we can continue with 
-                  // updating the page's 5-day forcast
-                  // really supid code but we really don't need anything more complex 
+                  // updating the page's 5-day forecast
+                  //stupid code but we don't need anything more complex 
                   for (let i = 0; i < weatherCall5DayData.list.length; i = i + 8) {
 
-                    // while loop is iterating, the code will store data
+                    //While the loop is iterating, the code will store data
                     let temperature5Day = weatherCall5DayData.list[i].main.temp;
                     let humidity5Day = weatherCall5DayData.list[i].main.humidity;
                     let wind5Day = weatherCall5DayData.list[i].wind.speed;
                     let futureDay = weatherCall5DayData.list[i].dt_txt;
                     let icon5day = weatherCall5DayData.list[i].weather[0].icon;
 
-                    // removing the time stamp from the data grabbed
+                    //Removing the time stamp from the data grabbed
                     futureDay = futureDay.slice(0, futureDay.length - 9);
 
                     // in index.html the div whose id= 5day-target will have new elements with data
-                    // grabbed from api calls, these elemnts will be visible to the user and represent
-                    // weather data for the 5-day forcast
+                    // grabbed from API calls, these elements will be visible to the user and represent
+                    // weather data for the 5-day forecast
                     $('#5day-target').append('<div class="card">' +
                       '<div id="icon" class="p-2"><img id="wicon' + i + '" src="" alt="Weather icon"></div>' +
                       '<div class="card-body">' +
@@ -351,7 +351,7 @@ function apiCall(cityName) {
                       '</div>');
 
                     // https://stackoverflow.com/questions/44177417/how-to-display-openweathermap-weather-icon
-                    // the article approve provides instruction on how this operation is taking place
+                    // the article  provides instructions on how this operation is taking place
                     let iconUrl5day = "http://openweathermap.org/img/w/" + icon5day + ".png";
                     $('#wicon' + i).attr('src', iconUrl5day);
                     $('.weather-icon').append(icon5day);
@@ -370,7 +370,7 @@ function apiCall(cityName) {
     notRealCity();
 }
 
-// when the docuement is ready, run init and wait for button clicks
+// when the document is ready, run init and wait for button clicks
 $(function () {
 
   init();

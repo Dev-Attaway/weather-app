@@ -26,6 +26,6 @@ Source code:
 
 The webpage can be viewed through this link:
 (https://dev-attaway.github.io/weather-app/)
-## License
 
-Please take a look at the LICENSE in the repo.
+## License
+MIT-LICENSE.txt
